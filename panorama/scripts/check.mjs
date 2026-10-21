@@ -2,8 +2,8 @@
 /**
  * 校验 *.pano / *.panorama 数据文件是否符合 numas 全景图插件的格式。
  *
- * 用法：
- *   node apps/skills/panorama/scripts/check.mjs <file.pano>
+ * 用法（在本仓库根目录执行）：
+ *   node skills/panorama/scripts/check.mjs <file.pano>
  *
  * 判定：PASS 退出码 0；FAIL 退出码 1；只有警告退出码 0。
  *
@@ -18,23 +18,14 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
-/** js-yaml 由插件自带（media/yaml.min.js），也可退回 server 的依赖；不引入新依赖。 */
+/** js-yaml 3.15.2（MIT）随本脚本内置在 vendor/，不跨仓库取用。 */
 const loadYaml = () => {
-  const candidates = [
-    resolve(here, "../../../extensions/panorama/media/yaml.min.js"),
-    resolve(here, "../../../numas/server/node_modules/js-yaml"),
-  ];
-  for (const path of candidates) {
-    if (existsSync(path)) {
-      try {
-        return require(path);
-      } catch {
-        /* 换下一个候选 */
-      }
-    }
+  const path = resolve(here, "vendor/yaml.min.js");
+  if (!existsSync(path)) {
+    console.error(`[check] 找不到内置的 yaml 解析库：${path}`);
+    process.exit(1);
   }
-  console.error("[check] 找不到 js-yaml（试过 extensions/panorama/media 与 numas/server）");
-  process.exit(1);
+  return require(path);
 };
 
 const SIDES = new Set(["top", "right", "bottom", "left"]);
@@ -45,7 +36,7 @@ const warn = (msg) => warnings.push(msg);
 
 const target = process.argv[2];
 if (!target) {
-  console.error("用法：node apps/skills/panorama/scripts/check.mjs <file.pano>");
+  console.error("用法：node skills/panorama/scripts/check.mjs <file.pano>");
   process.exit(1);
 }
 

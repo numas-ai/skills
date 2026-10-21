@@ -116,14 +116,31 @@ edges:
 | 线斜着走 | 手工写了 `sSide` 后节点位置又变了；删掉该字段让编辑器重算 |
 | `y` 字段被写成 `'y'` | 正常：YAML 解析器会把 `y` 加引号，两种写法都能读 |
 
-## 八、现成示例
+## 八、一份可以直接用的骨架
 
-`examples/panorama/` 下有两个可直接打开的文件，建议拷一份改：
+```yaml
+title: ''
+subtitle: ''
+canvas: { w: 1200, h: 600 }
+nodeHeight: 72
+bands:
+  - { id: app,  label: webapp,       color: '#58a6ff' }
+  - { id: edge, label: 接入层服务,    color: '#fbbf24' }
+  - { id: svc,  label: 应用层服务,    color: '#f472b6' }
+  - { id: infra, label: 基础设施层服务, color: '#34d27b' }
+nodes:
+  - { id: web,     band: app,   title: webapp,        sub: 浏览器 · 前端,   x: 480, 'y': 60,  w: 240, h: 72 }
+  - { id: ingress, band: edge,  title: nginx-ingress, sub: 统一入口,        x: 200, 'y': 220, w: 800, h: 72 }
+  - { id: api,     band: svc,   title: api-server,    sub: 业务逻辑,        x: 200, 'y': 400, w: 220, h: 72 }
+  - { id: db,      band: infra, title: postgres,      sub: 主库,            x: 200, 'y': 560, w: 220, h: 72 }
+edges:
+  - { from: web,     to: ingress, url: example.com }
+  - { from: ingress, to: api,     url: /api/* }
+  - { from: api,     to: db,      url: 读写 }
+```
 
-| 文件 | 内容 |
-| --- | --- |
-| `hello.pano` | 最小示例：2 节点 / 1 连线 |
-| `webapp.pano` | 分层 Web 应用：接入层 → 应用层 → 基础设施层，含一条条件分支 |
+拷这份改成自己的结构即可：先改 `bands` 定配色，再改 `nodes` 摆位置，最后改 `edges` 连关系。
+坐标不必一次到位，打开后在界面里拖更省事。
 
 ## 九、生成后自检
 
