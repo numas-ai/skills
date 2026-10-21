@@ -161,3 +161,12 @@ node skills/panorama/scripts/check.mjs <文件.pano>
 node skills/panorama/scripts/check.mjs <file.pano>
 ```
 
+### hover 效果自检（交付前必跑）
+
+悬停任一节点，应同时看到**高亮成链 + 流动点在动**：
+
+- 该链路涉及的节点全部点亮，其余压暗；
+- 流动点沿链路连续移动，**不跳过接缝、不频闪**；
+- 双工连接（隧道）只有一条线，回程靠点反向移动表达。
+
+自动化判定（在插件里打开 `.pano` 后，控制台运行 `panoHoverCheck()`，脚本见 `.opencode/tools/pano-hover-check.js`），期望 `{ pass: true }`。
