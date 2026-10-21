@@ -161,6 +161,26 @@ for (const [i, e] of edges.entries()) {
   if (e.url != null && typeof e.url !== "string") warn(`${at} 的 url 应为字符串（连线标注）`);
 }
 
+/* ---------- 数据必须自带语义（否则渲染层无法让数据"自己说话"） ---------- */
+for (const [i, n] of nodes.entries()) {
+  if (!n || typeof n !== "object") continue;
+  const at = `nodes[${i}]${n && n.id ? `(${n.id})` : ""}`;
+  if (!n.title) fail(`${at} 缺少 title：节点没有名字，无法自我表达`);
+  if (!n.band) fail(`${at} 缺少 band：无法判断所属层，悬停时讲不出角色`);
+  if (!n.sub) warn(`${at} 缺少 sub：只有名字时，解释里说不出它是什么形态`);
+}
+for (const [i, e] of edges.entries()) {
+  if (!e || typeof e !== "object") continue;
+  const at = `edges[${i}]${e.from ? `(${e.from}→${e.to})` : ""}`;
+  // 边标签就是"这个调用是什么动作"，缺了就无法推导角色与上下游语义
+  if (!e.url) warn(`${at} 缺少 url：边没有语义标签，渲染层推不出这条连接的用途`);
+}
+for (const [i, b] of bands.entries()) {
+  if (!b || typeof b !== "object") continue;
+  if (!b.label) fail(`bands[${i}] 缺少 label：层没有名字`);
+  if (!b.color) warn(`bands[${i}] 缺少 color：层无法用颜色表达`);
+}
+
 /* ---------- 同一对节点之间不得有两条边（双工连接不是两条线） ---------- */
 const pairSeen = new Map();
 for (const [i, e] of edges.entries()) {
