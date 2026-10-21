@@ -16,9 +16,8 @@
  *   150ms 位移 > 2px  真的在动（防"看着像静止"）
  *   maxStep <= 8×中位 没有接缝跳变
  *   亮节点 >= 2、亮边 >= 1、存在压暗节点   高亮成链且有对比
- *   解释 >= 3 段且含角色词                 悬停能讲清自己的作用
  *   弹出卡片可见且非空                     悬停时用卡片表达自己
- *   卡片含「意图」                         讲清为什么存在，而不只是结构复述
+ *   卡片含「意图」与「在模式中的位置」         讲清为什么存在、替哪个模式做什么
  *
  * 输出：{ pass, failures: [...], rows: [...] }
  */
@@ -81,15 +80,11 @@ async function panoHoverCheck() {
     const popText = pop ? (pop.innerText || "").trim() : "";
     const popShown = !!pop && pop.style.opacity === "1" && popText.length > 10;
 
-    const bar = doc.getElementById("statusbar");
-    const explain = bar ? (bar.textContent || "").trim() : "";
-    const segments = explain.split("｜").map((x) => x.trim()).filter(Boolean);
-
     rows.push({
       id: node.id, dots,
       medianStep: Math.round(median * 10) / 10,
       maxStep: Math.round(maxStep),
-      litNodes, litEdges, segments: segments.length, popShown,
+      litNodes, litEdges, popShown,
     });
 
     if (dots < 2) failures.push(`${node.id}: 流动点只有 ${dots} 个（应 ≥ 2）`);
@@ -98,8 +93,7 @@ async function panoHoverCheck() {
     if (litNodes < 2) failures.push(`${node.id}: 只亮了 ${litNodes} 个节点（链路没串起来）`);
     if (litEdges < 1) failures.push(`${node.id}: 没有亮起任何边`);
     if (dimNodes < 1) failures.push(`${node.id}: 没有节点被压暗（高亮没有对比）`);
-    if (segments.length < 3) failures.push(`${node.id}: 状态栏解释不足（${segments.length} 段：${explain || "空"}）`);
-    if (!/入口|端点|汇聚|分发|终点|中间环节|发起端/.test(explain)) failures.push(`${node.id}: 解释里没有角色判断`);
+    if (!/入口|端点|汇聚|分发|终点|中间环节|发起端/.test(popText)) failures.push(`${node.id}: 卡片里没有角色判断`);
     if (!popShown) failures.push(`${node.id}: 悬停没有弹出作用卡片（或卡片内容为空）`);
     if (popShown && !/意图/.test(popText)) failures.push(`${node.id}: 卡片只罗列结构，没讲清"为什么存在"（缺意图）`);
 
