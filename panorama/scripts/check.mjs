@@ -3,7 +3,7 @@
  * 校验 *.pano / *.panorama 数据文件是否符合 numas 全景图插件的格式。
  *
  * 用法（在本仓库根目录执行）：
- *   node skills/panorama/scripts/check.mjs <file.pano>
+ *   node scripts/check.mjs <file.pano>
  *
  * 判定：PASS 退出码 0；FAIL 退出码 1；只有警告退出码 0。
  *
@@ -166,7 +166,6 @@ for (const [i, n] of nodes.entries()) {
   if (!n || typeof n !== "object") continue;
   const at = `nodes[${i}]${n && n.id ? `(${n.id})` : ""}`;
   if (!n.title) fail(`${at} 缺少 title：节点没有名字，无法自我表达`);
-  if (!n.band) fail(`${at} 缺少 band：无法判断所属层，悬停时讲不出角色`);
   if (!n.sub) warn(`${at} 缺少 sub：只有名字时，解释里说不出它是什么形态`);
 }
 for (const [i, e] of edges.entries()) {
