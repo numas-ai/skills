@@ -150,3 +150,14 @@ node skills/panorama/scripts/check.mjs <文件.pano>
 
 校验结构：字段齐全、id 唯一、`band` 引用存在、连线两端存在、`sSide`/`ratio` 合法、节点是否越出画布、节点是否重叠。
 输出 `PASS` 表示结构上能被插件正常打开；`FAIL` 会指出具体节点/边。
+
+## 十、双工连接与闭环（重要）
+
+- **同一条双工连接只画一条边**：不要在 `A → B` 之外再加一条 `B → A` 来表示「回程」。
+- 环路靠**悬停时的流动动画**表达：点沿闭环顺序连续跑，最后一段逆着同一条边走。
+- 交付前跑结构校验，它会直接拦住「同一对节点两条边」：
+
+```bash
+node skills/panorama/scripts/check.mjs <file.pano>
+```
+

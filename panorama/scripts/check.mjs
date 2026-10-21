@@ -161,6 +161,23 @@ for (const [i, e] of edges.entries()) {
   if (e.url != null && typeof e.url !== "string") warn(`${at} 的 url 应为字符串（连线标注）`);
 }
 
+/* ---------- 同一对节点之间不得有两条边（双工连接不是两条线） ---------- */
+const pairSeen = new Map();
+for (const [i, e] of edges.entries()) {
+  if (!e || !e.from || !e.to) continue;
+  const key = [e.from, e.to].sort().join("\u0000");
+  if (pairSeen.has(key)) {
+    const prev = pairSeen.get(key);
+    const parallel = !!(e.parallel && edges[prev].parallel);
+    const msg = `edges[${prev}] 与 edges[${i}] 连接同一对节点（${e.from} ↔ ${e.to}）；一条双工连接只能画一条边，用流动点双向表达，不要画两条线`;
+    if (parallel) warn(`${msg}（双方已标 parallel: true，视为有意）`);
+    else fail(msg);
+  } else {
+    pairSeen.set(key, i);
+  }
+  if (e.duplex != null && typeof e.duplex !== "boolean") fail(`edges[${i}] 的 duplex 应为布尔`);
+}
+
 /* ---------- 输出 ---------- */
 const counts = `bands=${bands.length} nodes=${nodes.length} edges=${edges.length}`;
 for (const w of warnings) console.log(`[warn] ${w}`);
