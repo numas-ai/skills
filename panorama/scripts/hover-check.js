@@ -17,6 +17,7 @@
  *   maxStep <= 8×中位 没有接缝跳变
  *   亮节点 >= 2、亮边 >= 1、存在压暗节点   高亮成链且有对比
  *   解释 >= 3 段且含角色词                 悬停能讲清自己的作用
+ *   弹出卡片可见且非空                     悬停时用卡片表达自己
  *
  * 输出：{ pass, failures: [...], rows: [...] }
  */
@@ -75,6 +76,10 @@ async function panoHoverCheck() {
     const dimNodes = graph.getNodes().filter((n) => +n.attr("body/opacity") < 1).length;
     const litEdges = graph.getEdges().filter((e) => +e.attr("line/strokeOpacity") === 1).length;
 
+    const pop = doc.getElementById("pano-popover");
+    const popText = pop ? (pop.innerText || "").trim() : "";
+    const popShown = !!pop && pop.style.opacity === "1" && popText.length > 10;
+
     const bar = doc.getElementById("statusbar");
     const explain = bar ? (bar.textContent || "").trim() : "";
     const segments = explain.split("｜").map((x) => x.trim()).filter(Boolean);
@@ -83,7 +88,7 @@ async function panoHoverCheck() {
       id: node.id, dots,
       medianStep: Math.round(median * 10) / 10,
       maxStep: Math.round(maxStep),
-      litNodes, litEdges, segments: segments.length,
+      litNodes, litEdges, segments: segments.length, popShown,
     });
 
     if (dots < 2) failures.push(`${node.id}: 流动点只有 ${dots} 个（应 ≥ 2）`);
@@ -94,6 +99,7 @@ async function panoHoverCheck() {
     if (dimNodes < 1) failures.push(`${node.id}: 没有节点被压暗（高亮没有对比）`);
     if (segments.length < 3) failures.push(`${node.id}: 状态栏解释不足（${segments.length} 段：${explain || "空"}）`);
     if (!/入口|端点|汇聚|分发|终点|中间环节|发起端/.test(explain)) failures.push(`${node.id}: 解释里没有角色判断`);
+    if (!popShown) failures.push(`${node.id}: 悬停没有弹出作用卡片（或卡片内容为空）`);
 
     fire(node.id, false);
     await wait(60);
