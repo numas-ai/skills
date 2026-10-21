@@ -18,6 +18,7 @@
  *   亮节点 >= 2、亮边 >= 1、存在压暗节点   高亮成链且有对比
  *   解释 >= 3 段且含角色词                 悬停能讲清自己的作用
  *   弹出卡片可见且非空                     悬停时用卡片表达自己
+ *   卡片含「意图」                         讲清为什么存在，而不只是结构复述
  *
  * 输出：{ pass, failures: [...], rows: [...] }
  */
@@ -100,6 +101,7 @@ async function panoHoverCheck() {
     if (segments.length < 3) failures.push(`${node.id}: 状态栏解释不足（${segments.length} 段：${explain || "空"}）`);
     if (!/入口|端点|汇聚|分发|终点|中间环节|发起端/.test(explain)) failures.push(`${node.id}: 解释里没有角色判断`);
     if (!popShown) failures.push(`${node.id}: 悬停没有弹出作用卡片（或卡片内容为空）`);
+    if (popShown && !/意图/.test(popText)) failures.push(`${node.id}: 卡片只罗列结构，没讲清"为什么存在"（缺意图）`);
 
     fire(node.id, false);
     await wait(60);
