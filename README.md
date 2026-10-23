@@ -14,6 +14,7 @@
 | 技能 | 产物（agent 维护的对象） | 渲染 / 消费方 | 自检 |
 | --- | --- | --- | --- |
 | [`panorama`](panorama/SKILL.md) | `*.pano` / `*.panorama` 数据文档（YAML：分层 / 节点 / 连线 / 语义标签） | numas 插件 `numas.panorama` | `node skills/panorama/scripts/check.mjs <file>` |
+| [`distillation`](distillation/SKILL.md) | `.distill/inbox` 的原始捕获 → 晋升为项目规则、技能、工具或 `decisions/` 决策记录 | 项目自身的 `AGENTS.md`、技能目录、工具目录 | `python3 skills/distillation/scripts/distill.py audit` |
 
 ## 自包含约定
 
