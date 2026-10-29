@@ -175,6 +175,46 @@ for (const [i, e] of edges.entries()) {
   if (e.url != null && typeof e.url !== "string") warn(`${at} 的 url 应为字符串（连线标注）`);
 }
 
+/* ---------- 显式 hover 流程（可选；不在 flows 中的节点 hover 无效果） ---------- */
+if (doc.flows != null) {
+  if (!Array.isArray(doc.flows)) {
+    fail("flows 应为数组");
+  } else {
+    const triggers = new Set();
+    for (const [i, flow] of doc.flows.entries()) {
+      const at = `flows[${i}]`;
+      if (!flow || typeof flow !== "object") {
+        fail(`${at} 不是对象`);
+        continue;
+      }
+      if (!flow.trigger || !nodeById.has(flow.trigger)) fail(`${at}.trigger 指向不存在的节点：${flow.trigger}`);
+      if (flow.trigger && triggers.has(flow.trigger)) fail(`flow trigger 重复：${flow.trigger}`);
+      if (flow.trigger) triggers.add(flow.trigger);
+      if (!Array.isArray(flow.paths) || flow.paths.length === 0) {
+        fail(`${at}.paths 必须包含至少一条路径`);
+        continue;
+      }
+      for (const [j, item] of flow.paths.entries()) {
+        const path = Array.isArray(item) ? item : item && item.nodes;
+        if (!Array.isArray(path) || path.length < 2) {
+          fail(`${at}.paths[${j}] 必须是至少含两个节点 id 的路径`);
+          continue;
+        }
+        if (path[0] !== flow.trigger) fail(`${at}.paths[${j}] 必须从 trigger 节点开始`);
+        for (let k = 0; k < path.length; k += 1) {
+          if (!nodeById.has(path[k])) fail(`${at}.paths[${j}] 引用了不存在的节点：${path[k]}`);
+          if (k === 0) continue;
+          const prev = path[k - 1];
+          const current = path[k];
+          if (!edges.some((edge) =>
+            (edge.from === prev && edge.to === current) || (edge.from === current && edge.to === prev),
+          )) fail(`${at}.paths[${j}] 的相邻节点没有对应连线：${prev} ↔ ${current}`);
+        }
+      }
+    }
+  }
+}
+
 /* ---------- 数据必须自带语义（否则渲染层无法让数据"自己说话"） ---------- */
 for (const [i, n] of nodes.entries()) {
   if (!n || typeof n !== "object") continue;
