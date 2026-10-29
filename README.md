@@ -13,14 +13,14 @@
 
 | 技能 | 产物（agent 维护的对象） | 渲染 / 消费方 | 自检 |
 | --- | --- | --- | --- |
-| [`panorama`](panorama/SKILL.md) | `*.pano` 数据文档（YAML：分层 / 节点 / 连线 / 语义标签）+ 产出方法（语义推导、连线规则、质量门） | numas 插件 `numas.panorama` | `node skills/panorama/scripts/check.mjs <file>` · 页面内 `hover-check.js` |
-| [`distillation`](distillation/SKILL.md) | `.distill/inbox` 的原始捕获 → 晋升为项目规则、技能、工具或 `decisions/` 决策记录 | 项目自身的 `AGENTS.md`、技能目录、工具目录 | `python3 skills/distillation/scripts/distill.py audit` |
+| [`panorama`](skills/panorama/SKILL.md) | `*.pano` 数据文档（YAML：分层 / 节点 / 连线 / 语义标签）+ 产出方法（语义推导、连线规则、质量门） | numas 插件 `numas.panorama` | `node skills/panorama/scripts/check.mjs <file>` · 页面内 `hover-check.js` |
+| [`distillation`](skills/distillation/SKILL.md) | `.distill/inbox` 的原始捕获 → 晋升为项目规则、技能、工具或 `decisions/` 决策记录 | 项目自身的 `AGENTS.md`、技能目录、工具目录 | `python3 skills/distillation/scripts/distill.py audit` |
 
 ## 自包含约定
 
 每个技能只依赖本仓库内的文件，不引用其它仓库的路径：
 
-- 需要第三方库就收进技能目录（如 `panorama/scripts/vendor/yaml.min.js`，js-yaml 3.15.2 / MIT）；
+- 需要第三方库就收进技能目录（如 `skills/panorama/scripts/vendor/yaml.min.js`，js-yaml 3.15.2 / MIT）；
 - 脚本里的路径一律相对本仓库根或技能目录；
 - 不出现在别的仓库里才能取到的东西（依赖、示例、数据）。
 

@@ -395,30 +395,22 @@ await panoHoverCheck()   // => { pass: true, failures: [], rows: [...] }
 
 ---
 
-## 十二、骨架（可直接改）
+## 十二、字段骨架（只示意结构，禁止照抄内容）
 
 ```yaml
-title: ''
-subtitle: ''
-canvas: { w: 1200, h: 700 }
-nodeHeight: 72
-bands:
-  - { id: local, label: 本地服务,       color: '#c084fc' }
-  - { id: edge,  label: 接入层服务,     color: '#fbbf24' }
-  - { id: svc,   label: 应用层服务,     color: '#f472b6' }
-  - { id: infra, label: 基础设施层服务, color: '#34d27b' }
+canvas: { w: <画布宽>, h: <画布高> }
+nodeHeight: <节点最小高度>
+bands:                 # 3–6 层；label 只写中文语义
+  - { id: <层id>, label: <层语义>, color: '<#rrggbb>' }
 nodes:
-  - { id: client,  band: local, title: 本地客户端,   sub: 桌面端 · 直连平台, x: 120, 'y': 60,  w: 200, h: 72 }
-  - { id: ingress, band: edge,  title: nginx-ingress, sub: 统一入口 · 按 host 分发, x: 120, 'y': 220, w: 760, h: 72 }
-  - { id: api,     band: svc,   title: api-server,   sub: opensumi/node · 业务编排, x: 200, 'y': 400, w: 220, h: 72 }
-  - { id: db,      band: infra, title: postgres,     sub: 主库 · 持久化, x: 200, 'y': 560, w: 220, h: 72 }
+  - { id: <节点id>, band: <层id>, title: <实体名>, sub: <它是什么 / 做什么>, x: <x>, y: <y>, w: <宽>, h: <高> }
 edges:
-  - { from: client,  to: ingress, url: 本地访问 · localhost:24096 }
-  - { from: ingress, to: api,     url: 已存在 → 路由 }
-  - { from: api,     to: db,      url: 读写 }
+  - { from: <源节点id>, to: <目标节点id>, url: <发生了什么动作> }
 ```
 
-改的顺序：`bands` 定层与配色 → `nodes` 定实体与坐标 → `edges` 定动作 → 跑校验 → 请人看。
+- 上面的值必须由当前需求推导，**不得沿用任何示例中的层名、节点名、颜色或坐标**；
+- 字段合法性以 `scripts/check.mjs` 为准；新增字段（如连线形状、标签位置）只在插件已实现时写入，不写未落地的字段。
+- 改的顺序：`bands` 定层与配色 → `nodes` 定实体与坐标 → `edges` 定动作 → 跑校验 → 请人看。
 
 ---
 
