@@ -156,6 +156,18 @@ for (const [i, e] of edges.entries()) {
       fail(`${at} 的 ${k} 应在 0–1：${e[k]}`);
     }
   }
+  if (e.points != null) {
+    if (!Array.isArray(e.points)) {
+      fail(`${at} 的 points 应为数组`);
+    } else {
+      e.points.forEach((p, j) => {
+        if (!p || !isNum(p.x) || !isNum(p.y)) fail(`${at} 的 points[${j}] 应为 { x, y } 数值`);
+      });
+    }
+  }
+  if (e.label != null) {
+    if (!isNum(e.label.x) || !isNum(e.label.y)) fail(`${at} 的 label 应为 { x, y } 数值`);
+  }
   if (e.arrow != null && typeof e.arrow !== "boolean") fail(`${at} 的 arrow 应为布尔`);
   if (e.dashed != null && typeof e.dashed !== "boolean") fail(`${at} 的 dashed 应为布尔`);
   if (e.url != null && typeof e.url !== "string") warn(`${at} 的 url 应为字符串（连线标注）`);
