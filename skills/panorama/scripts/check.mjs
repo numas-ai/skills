@@ -64,8 +64,10 @@ if (!doc || typeof doc !== "object") {
 /* ---------- 根字段 ---------- */
 const isNum = (v) => typeof v === "number" && Number.isFinite(v);
 const canvas = doc.canvas || {};
-if (!isNum(canvas.w) || !isNum(canvas.h) || canvas.w <= 0 || canvas.h <= 0) {
-  fail("canvas.w / canvas.h 缺失或非正数");
+if (canvas.w != null || canvas.h != null) {
+  if (!isNum(canvas.w) || !isNum(canvas.h) || canvas.w <= 0 || canvas.h <= 0) {
+    fail("canvas.w / canvas.h 非正数");
+  }
 }
 if (doc.nodeHeight != null && (!isNum(doc.nodeHeight) || doc.nodeHeight <= 0)) {
   warn("nodeHeight 非正数，插件会回退到 72");
@@ -105,14 +107,14 @@ for (const [i, n] of nodes.entries()) {
   if (n.band && !bandIds.has(n.band)) fail(`${at} 的 band 未定义：${n.band}`);
   if (!n.band) fail(`${at} 缺 band`);
   if (n.title == null) fail(`${at} 缺 title`);
+  nodeById.set(n.id, { ...n });
   for (const k of ["x", "y", "w", "h"]) {
-    if (!isNum(n[k])) fail(`${at} 的 ${k} 不是数字：${n[k]}`);
+    if (n[k] != null && !isNum(n[k])) fail(`${at} 的 ${k} 不是数字：${n[k]}`);
   }
   if (isNum(n.w) && n.w <= 0) fail(`${at} 的 w<=0`);
   if (isNum(n.h) && n.h <= 0) fail(`${at} 的 h<=0`);
 
   if (isNum(n.x) && isNum(n.y) && isNum(n.w) && isNum(n.h)) {
-    nodeById.set(n.id, { ...n });
     rects.push({ id: n.id, x: n.x, y: n.y, w: n.w, h: n.h });
     if (isNum(canvas.w) && isNum(canvas.h)) {
       if (n.x < 0 || n.y < 0 || n.x + n.w > canvas.w || n.y + n.h > canvas.h) {
