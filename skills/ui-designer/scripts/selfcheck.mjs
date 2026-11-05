@@ -5,7 +5,7 @@
  * 用法：
  *   node skills/skills/ui-designer/scripts/selfcheck.mjs <URL> [--dark] [--json]
  *
- * 检查项（对应 SKILL.md 第四、五节里"机器能查"的部分）：
+ * 检查项（对应 SKILL.md 第四节（光学）与第六节（动效）里"机器能查"的部分）：
  *   1. 分层不靠深色 1px 边框        —— 统计深色描边元素（亮色主题下）
  *   2. 数字等宽                    —— 样式表里是否出现 tabular-nums，且计时类元素生效
  *   3. 动效时长在档位内            —— transition/animation 时长必须落在允许集合
