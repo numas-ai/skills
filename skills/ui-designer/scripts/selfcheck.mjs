@@ -5,7 +5,7 @@
  * 用法：
  *   node skills/skills/ui-designer/scripts/selfcheck.mjs <URL> [--dark] [--json]
  *
- * 检查项（对应 SKILL.md 第二节）：
+ * 检查项（对应 SKILL.md 第四、五节里"机器能查"的部分）：
  *   1. 分层不靠深色 1px 边框        —— 统计深色描边元素（亮色主题下）
  *   2. 数字等宽                    —— 样式表里是否出现 tabular-nums，且计时类元素生效
  *   3. 动效时长在档位内            —— transition/animation 时长必须落在允许集合
@@ -47,8 +47,9 @@ try {
   }
 }
 
-/** 允许的动效时长（毫秒）。新增档位要同时更新 SKILL.md 的档位表。 */
-const ALLOWED_MS = new Set([0, 90, 120, 140, 180, 240, 300, 320, 460, 1000]);
+/* 动效不设白名单：档位数由"这套界面有几级重量"决定，不由固定表决定。
+   这里只判断"是不是成了体系"——值太散说明每处都在随手给。 */
+const MAX_MOTION_TIERS = 5;
 
 const browser = await chromium.launch(launchOptions);
 const page = await browser.newPage();
@@ -61,7 +62,7 @@ try {
   }
   await page.waitForTimeout(600);
 
-  report = await page.evaluate(({ isDark, allowed }) => {
+  report = await page.evaluate(({ isDark, maxTiers }) => {
     const issues = [];
 
     /* 1) 深色 1px 边框做分层（亮色主题下才算问题） */
@@ -111,8 +112,8 @@ try {
       issues.push({ id: "tabular-nums", level: "info", detail: `数值元素未用等宽数字（${expectTabular.slice(0, 3).join(" / ")}）` });
     }
 
-    /* 3) 动效时长档位 */
-    const badDurations = [];
+    /* 3) 动效是否成体系：时长种类过多 = 每处随手给，而不是"轻/中/重"几级 */
+    const durations = new Set();
     for (const el of document.querySelectorAll("body *")) {
       const s = getComputedStyle(el);
       for (const raw of `${s.transitionDuration},${s.animationDuration}`.split(",")) {
@@ -121,12 +122,16 @@ try {
         const ms = v.endsWith("ms") ? parseFloat(v) : v.endsWith("s") ? parseFloat(v) * 1000 : NaN;
         if (Number.isNaN(ms) || ms === 0) continue;
         if (ms > 2000) continue; /* 环境动画/装饰动画不按交互档位要求 */
-        if (!allowed.includes(Math.round(ms))) badDurations.push(`${Math.round(ms)}ms`);
+        durations.add(Math.round(ms));
       }
     }
-    if (badDurations.length > 0) {
-      const uniq = [...new Set(badDurations)];
-      issues.push({ id: "motion-scale", level: "info", detail: `动效时长不在档位内：${uniq.slice(0, 5).join(", ")}` });
+    const tiers = [...durations].sort((a, b) => a - b);
+    if (tiers.length > maxTiers) {
+      issues.push({
+        id: "motion-scale",
+        level: "info",
+        detail: `动效有 ${tiers.length} 个不同时长（${tiers.join(", ")}ms），看不出"轻/中/重"分级；先定几级重量，再把值收拢`,
+      });
     }
 
     /* 4) prefers-reduced-motion */
@@ -155,7 +160,7 @@ try {
     }
 
     return { issues };
-  }, { isDark: dark, allowed: [...ALLOWED_MS] });
+  }, { isDark: dark, maxTiers: MAX_MOTION_TIERS });
 } catch (error) {
   await browser.close();
   console.error(`打开页面失败：${error instanceof Error ? error.message : String(error)}`);
