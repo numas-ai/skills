@@ -15,6 +15,7 @@
 | --- | --- | --- | --- |
 | [`panorama`](skills/panorama/SKILL.md) | `*.pano` 数据文档（YAML：分层 / 节点 / 连线 / 语义标签）+ 产出方法（语义推导、连线规则、质量门） | 工作台插件 `numas.panorama` | `node <技能目录>/scripts/check.mjs <file>` · `node <技能目录>/scripts/quality.mjs <file>` · 页面内 `hover-check.js` |
 | [`distillation`](skills/distillation/SKILL.md) | `.distill/inbox` 的原始捕获 → 晋升为项目规则、技能、工具或 `decisions/` 决策记录 | 项目自身的 `AGENTS.md`、技能目录、工具目录 | `python3 skills/distillation/scripts/distill.py audit` |
+| [`ui-designer`](skills/ui-designer/SKILL.md) | 以资深 UI 设计师身份产出与验收：Design Read、视觉系统、六个变贵的细节、动效性格、设计评审式验收 | Web 页面 / 工作台 / 对话应用 / 原型 | `node <技能目录>/scripts/selfcheck.mjs <URL>`（提示清单，非门禁） |
 
 ## 自包含约定
 
